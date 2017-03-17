@@ -1,0 +1,10 @@
+services:
+  config.manager:
+    class: BinckCli\Config\ConfigManager
+    arguments: ["@parser", "@dumper"]
+  dumper:
+    class: Symfony\Component\Yaml\Dumper
+    lazy: true
+  parser:
+    class: Symfony\Component\Yaml\Parser
+    lazy: true

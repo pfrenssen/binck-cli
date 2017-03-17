@@ -1,0 +1,15 @@
+base_url: 'https://login.binck.be/klanten/login/'
+
+credentials:
+  username: 'my username'
+  password: 'my password'
+
+mink:
+  default_session: 'selenium2'
+  sessions:
+    phantomjs:
+      host: 'http://127.0.0.1:8510'
+      template_cache: 'tmp'
+    selenium2:
+      browser: 'chrome'
+      host: 'http://localhost:4444/wd/hub'
