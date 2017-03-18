@@ -11,7 +11,8 @@
         "symfony/console": "^3.0",
         "symfony/css-selector": "^3.0",
         "symfony/dependency-injection": "^3.0",
-        "symfony/yaml": "^3.0"
+        "symfony/yaml": "^3.0",
+        "phpoffice/phpexcel": "^1.8"
     },
     "autoload": {
         "psr-4": {
