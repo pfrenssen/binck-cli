@@ -1,4 +1,4 @@
-base_url: 'https://login.binck.be/klanten/login/'
+base_url: 'https://web.binck.be/Logon?culture=nl-BE'
 
 credentials:
   username: 'my username'

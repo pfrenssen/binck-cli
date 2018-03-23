@@ -174,12 +174,12 @@ abstract class CommandBase extends Command
         $config = $this->getConfigManager()->get('config');
         $base_url = $config->get('base_url');
         $this->session->visit($base_url);
-        $this->session->getPage()->fillField('username', $config->get('credentials.username'));
-        $this->session->getPage()->fillField('password', $config->get('credentials.password'));
-        $this->session->getPage()->pressButton('logonButton');
-        $this->waitForElementPresence('a.callToAction');
-        $this->session->getPage()->clickLink('Verder zonder code');
-        $this->waitForElementPresence('#navigation');
+        $this->session->getPage()->fillField('UserName', $config->get('credentials.username'));
+        $this->session->getPage()->fillField('Password', $config->get('credentials.password'));
+        $this->session->getPage()->pressButton('Inloggen');
+        $this->waitForElementPresence('#loginTwoFactor');
+        $this->session->getPage()->clickLink('Alleen rekening raadplegen (zonder code)');
+        $this->waitForElementPresence('#secondary-nav-left');
     }
 
     /**
@@ -187,7 +187,8 @@ abstract class CommandBase extends Command
      */
     protected function visitPortfolioOverview()
     {
-        $this->session->visit('https://login.binck.be/Klanten/Portefeuille/PortefeuilleOverzicht.aspx');
+        $this->session->visit('https://web.binck.be/PortfolioOverview/Index');
+        $this->waitForElementVisibility('//table[contains(concat(" ", normalize-space(@class), " "), " sticky-portfolio-overview-table ")]', 'xpath');
     }
 
 }
