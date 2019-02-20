@@ -3,6 +3,8 @@
     "description": "Command line interface for BinckBank.",
     "license": "GPL-3.0",
     "require": {
+        "php": ">=7.1.0",
+        "ext-json": "*",
         "behat/mink": "^1.7",
         "behat/mink-selenium2-driver": "^1.3",
         "jcalderonzumba/mink-phantomjs-driver": "^0.3.1",
