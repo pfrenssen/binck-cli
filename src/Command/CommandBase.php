@@ -191,4 +191,13 @@ abstract class CommandBase extends Command
         $this->waitForElementVisibility('//table[contains(concat(" ", normalize-space(@class), " "), " sticky-portfolio-overview-table ")]', 'xpath');
     }
 
+    /**
+     * Navigates to the results overview.
+     */
+    protected function visitResultsOverview()
+    {
+        $this->session->visit('https://web.binck.be/ResultsOverview/Index');
+        $this->waitForElementVisibility('//table[@id = "resultsTable"]', 'xpath');
+    }
+
 }
