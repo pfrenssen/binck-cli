@@ -14,13 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CashDividendReport extends CommandBase
 {
 
-    const COOKIES = [
-        'web.binck.be' => [
-            '.BinckMvc',
-            'ASP.NET_SessionId',
-            '__RequestVerificationToken',
-        ],
-    ];
 
     /**
      * {@inheritdoc}

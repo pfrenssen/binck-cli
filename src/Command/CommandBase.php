@@ -16,6 +16,17 @@ abstract class CommandBase extends Command
 {
 
     /**
+     * Enumerates the cookies that need to be passed in REST requests.
+     */
+    const COOKIES = [
+        'web.binck.be' => [
+            '.BinckMvc',
+            'ASP.NET_SessionId',
+            '__RequestVerificationToken',
+        ],
+    ];
+
+    /**
      * The Mink session manager.
      *
      * @var \Behat\Mink\Mink
