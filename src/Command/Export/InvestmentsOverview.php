@@ -2,22 +2,27 @@
 
 namespace BinckCli\Command\Export;
 
-use Behat\Mink\Element\NodeElement;
 use BinckCli\Command\CommandBase;
+use BinckCli\Traits\ResultsTrait;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Console command to export the transaction history.
+ * Console command to export an overview of investments.
+ *
+ * This currently exports the investments from the previous year.
  */
-class TransactionHistory extends CommandBase
+class InvestmentsOverview extends CommandBase
 {
+
+    use ResultsTrait;
 
     const TRANSACTION_TYPE_MAPPING = [
         'Aankoop' => 'Purchase',
-        'Verkoop' => 'Sale',
         'Deponering' => 'Deposit',
+        'Lichting' => 'Delisting',
+        'Verkoop' => 'Sale',
     ];
 
     /**
@@ -28,8 +33,8 @@ class TransactionHistory extends CommandBase
         parent::configure();
 
         $this
-            ->setName('export:transaction-history')
-            ->setDescription('Exports the transaction history');
+            ->setName('export:investments')
+            ->setDescription('Exports an investments overview');
     }
 
     /**
@@ -47,19 +52,22 @@ class TransactionHistory extends CommandBase
         $this->session = $this->getSession();
 
         $this->logIn();
-        $this->visitPortfolioOverview();
+        $this->visitResultsOverview();
 
-        // Retrieve info about the funds to collect from the links leading to
-        // the transaction history pages of the funds.
+        // Retrieve info about the past year.
+        // @todo Make this configurable through an option on the command line.
+        $year = date('Y', strtotime('-1 year'));
+
+        // Receive data from last year's ETF's.
+        // @todo Support other categories.
         $funds = [];
-        $xpath = '//table[contains(concat(" ", normalize-space(@class), " "), " sticky-portfolio-overview-table ")]//button[contains(concat(" ", normalize-space(@class), " "), " context-menu ")]';
-        /** @var NodeElement $element */
-        foreach ($this->session->getPage()->findAll('xpath', $xpath) as $element) {
-            $data = json_decode($element->getAttribute('data-request'));
-            // Only consider funds of type '0'. Skip all other types (e.g. type '2' is cash dividends).
-            if ($data->SecurityType != 0) continue;
-            $funds[$data->SecurityId] = $element->getAttribute('data-title');
-        }
+        $page = 1;
+        do {
+            $data = $this->getResultHistory($year, 'Trackers', $page);
+            foreach ($data->ResultsHistoryItems as $item) {
+                $funds[$item->SecurityId] = $item->SecurityName;
+            }
+        } while ($page++ < $data->NoOfPages);
 
         // Initialize an Excel sheet to save the data in.
         $sheet = new \PHPExcel();
@@ -88,25 +96,21 @@ class TransactionHistory extends CommandBase
         foreach ($funds as $id => $name) {
             $transactions = [];
             $output->writeln("\n<info>$name</info>");
-            $this->session->visit('https://web.binck.be/PositionMutationsHistory?securityId=' . $id . '&filterMode=All');
-            // The data seems to appear in two distinct steps: first the table appears but is not yet filled with data.
-            // Then when the info about the security appears above the table the contents are also filled.
-            $this->waitForElementVisibility('//table[@id="PositionMutationsHistoryTable"]/tbody/tr/td', 'xpath');
-            $this->waitForElementVisibility('//h1[@id="SecurityHeader"]', 'xpath');
-            // In any case wait for the spinner to disappear.
-            $this->waitForElementPresence('#spinner', 'css', false);
+            $data = $this->getPositionMutations($id);
 
-            $xpath = '//table[@id="PositionMutationsHistoryTable"]/tbody/tr';
-            /** @var NodeElement[] $rows */
-            $rows = $this->session->getPage()->findAll('xpath', $xpath);
-
-            foreach ($rows as $row) {
-                $columns = $row->findAll('css', 'td');
-
-                $transactions[] = array_map(function (NodeElement $column) {
-                    return $column->getText();
-                }, $columns);
+            if ($data->NoOfPages !== 1) {
+                throw new \Exception('There are ' . $data->NoOfPages . ' result pages but multipage results are not implemented yet.');
             }
+
+            $transactions = array_map(function (\stdClass $mutation) {
+                return [
+                    'Date' => $mutation->TransactionDate,
+                    'Transaction' => $mutation->TransactionType,
+                    'Number' => $mutation->Mutation,
+                    'Share price' => $mutation->Price,
+                    'Position' => $mutation->NewPosition,
+                ];
+            }, $data->PositionMutationDetails);
 
             // Show progress output in the CLI while working.
             $table = new Table($output);
@@ -163,7 +167,7 @@ class TransactionHistory extends CommandBase
         // Export Excel file.
         $writer = \PHPExcel_IOFactory::createWriter($sheet, 'Excel2007');
         $writer->setPreCalculateFormulas(true);
-        $writer->save('export.xlsx');
+        $writer->save('investments.xlsx');
     }
 
     protected function translateTransactionType($type)

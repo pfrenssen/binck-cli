@@ -3,7 +3,7 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use BinckCli\Command\Export\CashDividendReport;
-use BinckCli\Command\Export\TransactionHistory;
+use BinckCli\Command\Export\InvestmentsOverview;
 use BinckCli\Helper\ContainerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
@@ -26,6 +26,6 @@ $helperSet->set(new ContainerHelper($container));
 
 // Add commands.
 $application->add(new CashDividendReport());
-$application->add(new TransactionHistory());
+$application->add(new InvestmentsOverview());
 
 $application->run();
