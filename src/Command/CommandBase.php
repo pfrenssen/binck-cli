@@ -188,8 +188,6 @@ abstract class CommandBase extends Command
         $this->session->getPage()->fillField('UserName', $config->get('credentials.username'));
         $this->session->getPage()->fillField('Password', $config->get('credentials.password'));
         $this->session->getPage()->pressButton('Inloggen');
-        $this->waitForElementPresence('#loginTwoFactor');
-        $this->session->getPage()->clickLink('Alleen rekening raadplegen (zonder code)');
         $this->waitForElementPresence('#secondary-nav-left');
     }
 
