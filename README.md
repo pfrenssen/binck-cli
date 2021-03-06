@@ -13,17 +13,7 @@ clicking through the website.
 
 ## Requirements
 
-This requires PHP 5.6 or higher, and either Selenium 2 or PhantomJS. It is also
-necessary to block access to https://stream.login.binck.be - for some reason
-the developers of the BinckBank platform have used a crummy neverending request
-instead of websockets to update their realtime information. This prevents the
-webdriver from returning after navigating to a page.
-
-The easiest way to block access is by adding the domain to /etc/hosts:
-
-```
-# echo '127.0.0.1 stream.login.binck.be' >> /etc/hosts
-```
+This requires PHP 5.6 or higher, and either Selenium 2 or PhantomJS.
 
 Running Selenium 2 locally:
 
