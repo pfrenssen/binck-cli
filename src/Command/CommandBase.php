@@ -184,10 +184,17 @@ abstract class CommandBase extends Command
     {
         $config = $this->getConfigManager()->get('config');
         $base_url = $config->get('base_url');
+
+        // Log in using user name and password.
         $this->session->visit($base_url);
         $this->session->getPage()->fillField('UserName', $config->get('credentials.username'));
         $this->session->getPage()->fillField('Password', $config->get('credentials.password'));
         $this->session->getPage()->pressButton('Inloggen');
+
+        // Skip two factor authentication.
+        $this->waitForElementPresence('#loginTwoFactor');
+        $this->session->getPage()->clickLink('Alleen rekening raadplegen (zonder code)');
+
         $this->waitForElementPresence('#secondary-nav-left');
     }
 
