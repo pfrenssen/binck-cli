@@ -1,3 +1,5 @@
+This project has been archived since BinckBank has been acquired by Saxo Bank.
+
 # Command line interface for BinckBank
 
 This project allows to do basic actions on the BinckBank online banking
